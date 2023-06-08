@@ -123,11 +123,58 @@ def print_blocks(blocks: Sequence[documentai.Document.Page.Block], text: str) ->
 
 def print_lines(lines: Sequence[documentai.Document.Page.Line], text: str) -> None:
     print(f"    {len(lines)} lines detected:")
-    first_line_text = layout_to_text(lines[0].layout, text)
-    print(f"        First line text: {repr(first_line_text)}")
-    last_line_text = layout_to_text(lines[-1].layout, text)
-    print(f"        Last line text: {repr(last_line_text)}")
 
+    # Sort lines by their y position
+    sorted_lines = sorted(lines, key=lambda line: line.layout.bounding_poly.vertices[0].y)
+
+    # Group lines with similar y positions
+    grouped_lines = []
+    for i, line in enumerate(sorted_lines):
+        line_text = layout_to_text(line.layout, text)
+        line_x = line.layout.bounding_poly.vertices[0].x
+        line_y = line.layout.bounding_poly.vertices[0].y
+
+        # Calculate the average difference in y positions between consecutive lines for every 10 lines
+        if i % 3 == 0:
+            y_diffs = []
+            for j in range(i + 1, min(i + 11, len(sorted_lines))):
+                prev_line_y = sorted_lines[j - 1].layout.bounding_poly.vertices[0].y
+                curr_line_y = sorted_lines[j].layout.bounding_poly.vertices[0].y
+                y_diffs.append(curr_line_y - prev_line_y)
+            avg_y_diff = sum(y_diffs) / len(y_diffs)
+
+            # Set the tolerance value based on the average y difference
+            tolerance = avg_y_diff / 2
+            print(f"        Average y difference: {avg_y_diff:.1f}")
+            
+        added_to_group = False
+        for group in grouped_lines:
+            group_y = group[0][2]
+            if abs(line_y - group_y) <= tolerance:
+                group.append((line_text, line_x, line_y))
+                added_to_group = True
+                break
+
+        if not added_to_group:
+            grouped_lines.append([(line_text, line_x, line_y)])
+
+    # Sort lines in each group by their x position
+    for group in grouped_lines:
+        group.sort(key=lambda x: x[1])
+
+    # Print grouped lines with adjusted spacing
+    for group in grouped_lines:
+        line_texts = []
+        for i, line in enumerate(group):
+            line_text = line[0].replace('\n', ' ')  # Replace newline characters with spaces
+            if i > 0:
+                prev_line_x = group[i - 1][1]
+                curr_line_x = line[1]
+                space_count = max(int((curr_line_x - prev_line_x) / 100), 4)  # Adjust this value to control the spacing
+                line_texts.append(" " * space_count + line_text)
+            else:
+                line_texts.append(line_text)
+        print("".join(line_texts))
 
 def print_tokens(tokens: Sequence[documentai.Document.Page.Token], text: str) -> None:
     print(f"    {len(tokens)} tokens detected:")
@@ -163,16 +210,18 @@ def layout_to_text(layout: documentai.Document.Page.Layout, text: str) -> str:
     for segment in layout.text_anchor.text_segments:
         start_index = int(segment.start_index)
         end_index = int(segment.end_index)
-        response += text[start_index:end_index]
+        response += text[start_index:end_index].replace('\n', ' ')
     return response
 
 
 # TODO(developer): Edit these variables before running the sample.
-project_id = "YOUR_PROJECT_ID"
-location = "YOUR_PROCESSOR_LOCATION"  # Format is 'us' or 'eu'
-processor_id = "YOUR_PROCESSOR_ID"  # Create processor before running sample
+project_id = "bright-black-ai"
+location = "us"  # Format is 'us' or 'eu'
+processor_id = "9db77bc6dadc8719"  # Create processor before running sample
 processor_version = "pretrained-ocr-v1.2-2022-11-10"
-file_path = "DeclarationOfIndependence-Cursive.pdf"
+file_path = "/Users/sheresaidon/Downloads/Bloodwork_PII.pdf"
+# file_path = "/Users/sheresaidon/Downloads/test2.pdf"
+
 mime_type = "application/pdf"  # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
 enable_native_pdf_parsing = True
 

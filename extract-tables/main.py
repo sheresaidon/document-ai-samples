@@ -81,12 +81,14 @@ def text_anchor_to_text(text_anchor: documentai.Document.TextAnchor, text: str) 
     return response.strip().replace("\n", " ")
 
 
-PROJECT_ID = "YOUR_PROJECT_ID"
-LOCATION = "YOUR_PROJECT_LOCATION"  # Format is 'us' or 'eu'
-PROCESSOR_ID = "FORM_PARSER_ID"  # Create processor in Cloud Console
-
+PROJECT_ID = "bright-black-ai"
+LOCATION = "us"  # Format is 'us' or 'eu'
+PROCESSOR_ID = "9db77bc6dadc8719"  # Create processor in Cloud Console
+# project_id = "bright-black-ai"
+# location = "us"  # Format is 'us' or 'eu'
+# processor_id = "9db77bc6dadc8719"  # Create processor before running sample
 # The local file in your current working directory
-FILE_PATH = "form_with_tables.pdf"
+FILE_PATH = "/Users/sheresaidon/Downloads/test2.pdf"
 # Refer to https://cloud.google.com/document-ai/docs/processors-list
 # for supported file types
 MIME_TYPE = "application/pdf"
