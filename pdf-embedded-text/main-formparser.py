@@ -4,9 +4,10 @@ from pdf2image import convert_from_path
 from PIL import Image, ImageDraw
 import os
 from PyPDF2 import PdfWriter, PdfReader
-
+import pandas as pd
 from google.api_core.client_options import ClientOptions
 from google.cloud import documentai_v1beta3 as documentai
+import csv
 
 
 def process_document_ocr_sample(
@@ -18,7 +19,6 @@ def process_document_ocr_sample(
     mime_type: str,
     enable_native_pdf_parsing: bool,
 ) -> None:
-    # Online processing request to Document AI
     document = process_document(
         project_id,
         location,
@@ -28,9 +28,6 @@ def process_document_ocr_sample(
         mime_type,
         enable_native_pdf_parsing,
     )
-
-    # For a full list of Document object attributes, please reference this page:
-    # https://cloud.google.com/python/docs/reference/documentai/latest/google.cloud.documentai_v1.types.Document
 
     text = document.text
     print(f"Full document text: {text}\n")
@@ -43,13 +40,38 @@ def process_document_ocr_sample(
         print_detected_langauges(page.detected_languages)
         print_paragraphs(page.paragraphs, text)
         print_blocks(page.blocks, text)
-        lines_text, tables_text = print_lines(page.lines, text, page.tables)
-        output_text += lines_text + tables_text
+        lines_text = print_lines(page.lines, text, page.tables)
+        output_text += lines_text
         print_tokens(page.tokens, text)
+        for index, table in enumerate(page.tables):
+            header_row_values = get_table_data(table.header_rows, document.text)
+            body_row_values = get_table_data(table.body_rows, document.text)
 
-        # Currently supported in version pretrained-ocr-v1.1-2022-09-12
-        if page.image_quality_scores:
-            print_image_quality_scores(page.image_quality_scores)
+            df = pd.DataFrame(
+                data=body_row_values,
+                columns=pd.MultiIndex.from_arrays(header_row_values),
+            )
+
+            num_columns = len(header_row_values[0])
+            num_rows = len(body_row_values)
+
+            output_text += f"--- START TABLE Page {page.page_number} - Table {index} --- \n"
+            output_text += f"Table with {num_columns} columns and {num_rows} rows:\n"
+            output_text += f"Columns: {'|'.join(header_row_values[0])}\n"
+            if num_rows > 0:
+                output_text += f"Table body data:\n"
+            for row in body_row_values:
+                row_text = " | ".join([repr(cell.strip()) for cell in row]) + " |"
+                output_text += row_text + "\n"
+            output_text += f"--- END TABLE Page {page.page_number} - Table {index} --- \n\n"
+        output_text += f"--- START FORM FIELDS---\n Identified {len(page.form_fields)} form field(s) for Page {page.page_number} listed pairs below (name : value) :\n"
+        for field in page.form_fields:
+            name = layout_to_text(field.field_name, text)
+            value = layout_to_text(field.field_value, text)
+            print(f"Field Name {name} - Field Value: {value}")
+            row_text_field = f"    * {repr(name.strip())}: {repr(value.strip())}"
+            output_text += row_text_field + "\n"
+        output_text += f"---END FORM FIELDS---\n"
 
     save_text_to_file(document, output_text, "output_text.txt")
     save_annotated_pdf(document, input_pdf_path, output_pdf_path)
@@ -73,7 +95,8 @@ def process_document(
     # e.g. projects/{project_id}/locations/{location}/processors/{processor_id}/processorVersions/{processor_version_id}
     # You must create processors before running sample code.
     name = client.processor_version_path(
-        project_id, location, processor_id, processor_version
+        project_id, location, processor_id
+        , processor_version
     )
 
     # Read the file into memory
@@ -132,8 +155,33 @@ def print_blocks(blocks: Sequence[documentai.Document.Page.Block], text: str) ->
     print(f"        Last text block: {repr(last_block_text)}")
 
 
-def print_lines(lines: Sequence[documentai.Document.Page.Line], text: str, tables: Sequence[documentai.Document.Page.Table]) -> None:
+def print_lines(lines: Sequence[documentai.Document.Page.Line], text: str, tables: Sequence[documentai.Document.Page.Table]) -> str:
     print(f"    {len(lines)} lines detected:")
+
+    # Get the bounding boxes of all table cells
+    table_bboxes = []
+    for table in tables:
+        all_rows = list(table.header_rows)
+        all_rows.extend(table.body_rows)
+        for row in all_rows:
+            for cell in row.cells:
+                table_bboxes.append(cell.layout.bounding_poly)
+
+    # Check if a line is inside any table bounding box
+    def is_line_in_table(line_bbox, table_bboxes):
+        for table_bbox in table_bboxes:
+            if (
+                line_bbox.vertices[0].x >= table_bbox.vertices[0].x
+                and line_bbox.vertices[0].y >= table_bbox.vertices[0].y
+                and line_bbox.vertices[2].x <= table_bbox.vertices[2].x
+                and line_bbox.vertices[2].y <= table_bbox.vertices[2].y
+            ):
+                return True
+        return False
+
+    # Filter out lines that are inside table bounding boxes
+    lines = [line for line in lines if not is_line_in_table(line.layout.bounding_poly, table_bboxes)]
+
 
     # Sort lines by their y position
     sorted_lines = sorted(lines, key=lambda line: line.layout.bounding_poly.vertices[0].y)
@@ -152,7 +200,7 @@ def print_lines(lines: Sequence[documentai.Document.Page.Line], text: str, table
                 prev_line_y = sorted_lines[j - 1].layout.bounding_poly.vertices[0].y
                 curr_line_y = sorted_lines[j].layout.bounding_poly.vertices[0].y
                 y_diffs.append(curr_line_y - prev_line_y)
-            
+
             # Check if y_diffs is not empty before calculating the average y difference
             if y_diffs:
                 avg_y_diff = sum(y_diffs) / len(y_diffs)
@@ -160,7 +208,7 @@ def print_lines(lines: Sequence[documentai.Document.Page.Line], text: str, table
                 # Set the tolerance value based on the average y difference
                 tolerance = avg_y_diff / 2
                 print(f"        Average y difference: {avg_y_diff:.1f}")
-            
+
         added_to_group = False
         for group in grouped_lines:
             group_y = group[0][2]
@@ -181,29 +229,24 @@ def print_lines(lines: Sequence[documentai.Document.Page.Line], text: str, table
     for group in grouped_lines:
         line_texts = []
         for i, line in enumerate(group):
-            line_text = line[0].replace('\n', '\n')  # Replace newline characters with spaces
+            line_text = line[0].replace('\n', ' ')  # Replace newline characters with spaces
+            # line_bbox = sorted_lines[i].layout.bounding_poly
+            # Skip the line if it is part of a table
+            # if is_line_in_table(line_bbox, table_bboxes):
+            #     continue
+
             if i > 0:
                 prev_line_x = group[i - 1][1]
                 curr_line_x = line[1]
-                space_count = max(int((curr_line_x - prev_line_x) / 100), 10)  # Adjust this value to control the spacing
+                space_count = max(int((curr_line_x - prev_line_x) / 100), 4)  # Adjust this value to control the spacing
                 line_texts.append(" " * space_count + line_text)
             else:
                 line_texts.append(line_text)
         lines_text += "".join(line_texts) + "\n"
+    print(lines_text)
+    return lines_text
 
-    # Print tables
-    tables_text = ""
-    if tables:
-        tables_text += "Tables:\n"
-        for table_idx, table in enumerate(tables):
-            tables_text += f"Table {table_idx + 1}:\n"
-            header_row_values = get_table_data(table.header_rows, text)
-            body_row_values = get_table_data(table.body_rows, text)
-            all_rows = header_row_values + body_row_values
-            for row in all_rows:
-                tables_text += "\t".join(row) + "\n"
 
-    return lines_text, tables_text
 
 def save_text_to_file(document: documentai.Document, output_text: str, output_file_path: str) -> None:
     with open(output_file_path, "w") as output_file:
@@ -263,6 +306,14 @@ def get_table_data(
         all_values.append(current_row_values)
     return all_values
 
+def print_table_rows(table_rows: Sequence[documentai.Document.Page.Table.TableRow], text: str) -> None:
+    for table_row in table_rows:
+        row_text = ""
+        for cell in table_row.cells:
+            cell_text = layout_to_text(cell.layout, text)
+            row_text += f"{repr(cell_text.strip())} | "
+        print(row_text)
+        
 def text_anchor_to_text(text_anchor: documentai.Document.TextAnchor, text: str) -> str:
     """
     Document AI identifies table data by their offsets in the entirity of the
