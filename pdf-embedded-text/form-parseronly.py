@@ -8,7 +8,7 @@ from google.cloud import documentai  # type: ignore
 project_id = 'bright-black-ai'
 location = 'us' # Format is 'us' or 'eu'
 processor_id = '18c798abe7fde749' # Create processor before running sample
-file_path = '/Users/sheresaidon/Downloads/nish/Bloodwork 2.pdf'
+file_path = '/Users/sheresaidon/Downloads/Pages from Deposition-3.pdf'
 mime_type = 'application/pdf' # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
 
 def process_document_form_sample(

@@ -340,36 +340,27 @@ def save_annotated_pdf(document: documentai.Document, input_pdf_path: str, outpu
         pdf_image = convert_from_path(input_pdf_path, size=size, first_page=page.page_number, last_page=page.page_number)[0]
         draw = ImageDraw.Draw(pdf_image)
         # Helper function to draw bounding boxes
-        def draw_bounding_box(layout, color, offset=1, width=3):
+        def draw_bounding_box(layout, color):
             vertices = layout.bounding_poly.vertices
             if len(vertices) == 4:
                 draw.polygon([
-                    (vertices[0].x + offset, vertices[0].y + offset),
-                    (vertices[1].x - offset, vertices[1].y + offset),
-                    (vertices[2].x - offset, vertices[2].y - offset),
-                    (vertices[3].x + offset, vertices[3].y - offset)
+                    (vertices[0].x, vertices[0].y),
+                    (vertices[1].x, vertices[1].y),
+                    (vertices[2].x, vertices[2].y),
+                    (vertices[3].x, vertices[3].y)
                 ], outline=color,
-                             width=width)
+                             width=3)
 
         # Draw bounding boxes for paragraphs, blocks, lines, and tokens
         for paragraph in page.paragraphs:
-            draw_bounding_box(paragraph.layout, 'red', width=1)
+            draw_bounding_box(paragraph.layout, 'red')
         for block in page.blocks:
-            draw_bounding_box(block.layout, 'blue', offset=2, width=1)
+            draw_bounding_box(block.layout, 'blue')
         for line in page.lines:
-            draw_bounding_box(line.layout, 'green', offset=3, width=1)
+            draw_bounding_box(line.layout, 'green')
         for token in page.tokens:
-            draw_bounding_box(token.layout, 'yellow', offset=4, width=1)
+            draw_bounding_box(token.layout, 'yellow')
 
-        # Draw bounding boxes for tables, headers, and rows
-        for table in page.tables:
-            draw_bounding_box(table.layout, 'magenta', offset=5, width=1)
-            for header_row in table.header_rows:
-                for cell in header_row.cells:
-                    draw_bounding_box(cell.layout, 'cyan', offset=6, width=1)
-            for row in table.body_rows:
-                for cell in row.cells:
-                    draw_bounding_box(cell.layout, 'orange', offset=7, width=1)
 
         # Save the annotated image as a PDF
         pdf_image.save(f"{output_pdf_path[:-4]}_page{page.page_number}.pdf", "PDF")

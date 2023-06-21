@@ -1,55 +1,44 @@
-Patient Results     RWJUH at Rahway 
-Nucleated Red Blood Cell     Lymphocytes Automated 
+Page 87 
+5 let's say 2012, approximately, when you last 
+6 treated for that accident, and the accident 
+7 that we're here for today? 
+10 you go for any treatment for any of the body 
+11 parts you're claiming injury to here? 
+(                1i     1., 
+14 have any other prior accident or incidents 
+15 where you made complaints of pain to your -- to 
+16 the body parts you're claiming injury to here, 
+17 your neck, lower back, your knee, your 
+18 shoulder? 
+19 A. 
+20 recall I did. I don't know. 
+25 A.     I -- I haven't been incarcerated since 
+Agrassanesinin katk 
+QUICK REPORTING SERVICE, INC           516-488-8822 
 --- START TABLE Page 1 - Table 0 --- 
-Table with 3 columns and 27 rows:
-Columns: 102-14-2022 11:58|CBC|1 or more Final Results Received:
+Table with 2 columns and 18 rows:
+Columns: 1  2|Q.  CHRISTOPHER  For the 2010 or 2011 accident.  Page 87
 Table body data:
-'WBC' | '7.0  [4.5-11.0 K/UL]' | 'Final' |
-'RBC' | '4.26  L  [4.7-6.1 M/UL]' | 'Final' |
-'Hemoglobin' | '13.4  L  [14.0-18.0 GM/DL]' | 'Final' |
-'Hematocrit' | '40.5  L  [42.0-52.0 %]' | 'Final' |
-'MCV' | '95.0  [82.0-98.0 FL]' | 'Final' |
-'MCH' | '[26.0-34.0 PG]  31.3' | 'Final' |
-'MCHC' | '[31.0-38.0 G/DL]  33.0' | 'Final' |
-'RDW' | '[11.5-14.6 %]  14.4' | 'Final' |
-'Platelet Count' | '[150-450 K/UL]  233' | 'Final' |
-'MPV  Differential.' | '[6.5-12.4 FL]  8.6  AUTO' | 'Final  Final' |
-'Neutrophil Absolute' | '3.5  [1.5-8.0 K/UL]' | 'Final' |
-'Lymphocyte Absolute' | '2.9  [0.8-4.0 K/UL]' | 'Final' |
-'Monocyte Absolute' | '0.5  [0.0-1.2 K/UL]' | 'Final' |
-'Absolute Eosinophils' | '0.1  [0.0-0.3 K/UL]' | 'Final' |
-'Basophil Absolute' | '0.0  [0.0-0.3 K/UL]' | 'Final' |
-'Neutrophils Automated' | '50.2  [37-80 %]' | 'Final' |
-'Lymphocytes Automated' | '[16-51 %]  41.9' | 'Final' |
-'Monocyte Automated' | '[0-12%]  6.5' | 'Final' |
-'Eosinophil Automated' | '[0-8 %]  0.8' | 'Final' |
-'Basophil Automated' | '[0-3 %]  0.6' | 'Final' |
-'Nucleated Red Blood' | '[K/UL]  Cell  0' | 'Final' |
-'WBC Definitive Flag' | 'NORMAL' | 'Final' |
-'WBC Suspect Flag' | 'NORMAL' | 'Final' |
-'RBC Definitive Flag' | 'NORMAL' | 'Final' |
-'RBC Suspect Flag' | 'NORMAL' | 'Final' |
-'PLT Definitive Flag' | 'NORMAL' | 'Final' |
-'PLT Suspect Flag' | 'NORMAL' | 'Final' |
+'3' | "A.  I don't recall." |
+'4' | 'Q.  Did you receive any treatment between,' |
+'5' | "let's say 2012, approximately, when you last" |
+'6' | 'treated for that accident, and the accident' |
+'7' | "that we're here for today?" |
+'8' | 'A.  No, not -- in between, no.' |
+'9' | "Q.  Even if it's not accident related, did" |
+'10' | 'you go for any treatment for any of the body' |
+'11' | "parts you're claiming injury to here?" |
+'12' | 'A.  No.' |
+'13  14 15' | 'Q.  Okay. Other than this accident, did you  have any other prior accident or incidents  where you made complaints of pain to your -- to' |
+'16' | "the body parts you're claiming injury to here," |
+'17' | 'your neck, lower back, your knee, your' |
+'18' | 'shoulder?' |
+'19 20 21' | "A.  Don't remember. I don't -- I don't  recall I did. I don't know.  Q.  Did you ever receive any treatment for" |
+'22' | 'any injuries while you were  incarcerated?' |
+'23' | 'A.  No.' |
+'24' | 'Q.  Okay.' |
 --- END TABLE Page 1 - Table 0 --- 
 
---- START TABLE Page 1 - Table 1 --- 
-Table with 1 columns and 0 rows:
-Columns: [MEHTA, PRIYAVADAN G  3-E 0334 - Bed 01  78y  M  Kalawur, Victoria  DSC  Feb-14-1944  0274621/400432614
---- END TABLE Page 1 - Table 1 --- 
-
---- START TABLE Page 1 - Table 2 --- 
-Table with 1 columns and 0 rows:
-Columns: Printed from: RHDpt MR Correspondence  Requested By: Morgan, Haneefah (Remote Chart  Reviewer)  03-04-2022 10:28  End of Report  Page: 1 of 1
---- END TABLE Page 1 - Table 2 --- 
-
 --- START FORM FIELDS---
- Identified 7 form field(s) for Page 1 listed pairs below (name : value) :
-    * 'Kalawur, Victoria': '0274621/400432614'
-    * '78y': 'M\nFeb-14-1944'
-    * 'Requested By: Morgan, Haneefah (Remote Chart\nReviewer)': '03-04-2022 10:28\nEnd of Report'
-    * '1 of 1': 'Page:'
-    * 'DSC': 'MEHTA, PRIYAVADAN G\n3-E 0334 - Bed 01'
-    * 'Patient Results': 'RWJUH at Rahway'
-    * '- Bed 01': '3-E 0334'
+ Identified 0 form field(s) for Page 1 listed pairs below (name : value) :
 ---END FORM FIELDS---
